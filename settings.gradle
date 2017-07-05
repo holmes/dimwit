@@ -1,0 +1,4 @@
+rootProject.name = 'dimwit'
+include 'api'
+include 'sample'
+
