@@ -10,14 +10,14 @@ import java.time.LocalTime
 class DimCalculator(val now: () -> LocalTime) {
   data class ToggleLightResult(val lowLevel: Int, val highLevel: Int)
 
-  fun toggleLights(zone: LightZone): ToggleLightResult {
-    val calculatedLevel = calculateLightLevel(zone)
+  fun calculateLightLevels(zone: LightZone): ToggleLightResult {
+    val calculatedLevel = calculateLowLevel(zone)
     val highLevel = zone.currentFrame(now).highLevel
 
     return ToggleLightResult(calculatedLevel, highLevel)
   }
 
-  private fun calculateLightLevel(zone: LightZone): Int {
+  private fun calculateLowLevel(zone: LightZone): Int {
     // Always use lowLevel in the morning.
     if (zone.isInFirstFrame(now)) {
       return zone.timeFrames.first().lowLevel

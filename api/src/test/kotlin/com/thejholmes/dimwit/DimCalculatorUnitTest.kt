@@ -30,7 +30,7 @@ class DimCalculatorUnitTest {
     val currentFrame = zone.timeFrames[0]
 
     now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone).lowLevel
+    val result = dimCalculator.calculateLightLevels(zone).lowLevel
     assertThat(result).isEqualTo(10)
   }
 
@@ -38,7 +38,7 @@ class DimCalculatorUnitTest {
     val currentFrame = zone.timeFrames[2]
 
     now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone).lowLevel
+    val result = dimCalculator.calculateLightLevels(zone).lowLevel
     assertThat(result).isEqualTo(50)
   }
 
@@ -46,7 +46,7 @@ class DimCalculatorUnitTest {
     val currentFrame = zone.timeFrames[3]
 
     now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone).lowLevel
+    val result = dimCalculator.calculateLightLevels(zone).lowLevel
     assertThat(result).isEqualTo(38)
   }
 
@@ -54,7 +54,7 @@ class DimCalculatorUnitTest {
     val currentFrame = zone.timeFrames[3]
 
     now = currentFrame.endTime().minusMinutes(30)
-    val result = dimCalculator.toggleLights(zone).lowLevel
+    val result = dimCalculator.calculateLightLevels(zone).lowLevel
     assertThat(result).isEqualTo(33)
   }
 
