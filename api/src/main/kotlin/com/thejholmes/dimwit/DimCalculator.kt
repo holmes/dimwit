@@ -10,35 +10,6 @@ import java.time.LocalTime
 class DimCalculator(val now: () -> LocalTime) {
   data class ToggleLightResult(val value: Int)
 
-  data class AutoDimResult(val dimLevel: Int, val needsReschedule: Boolean) {
-    companion object Factory {
-      val NO_CHANGE: AutoDimResult = AutoDimResult(-1, false)
-    }
-  }
-
-  /**
-   * Dim (or brighten) the lights if the calculated level is near the currentValue. We check that it's near
-   * because a person in the room might have turned the lights up intentionally. We don't want to turn them
-   * down if that's the case.
-   */
-  fun autoDim(zone: LightZone, currentValue: Int): AutoDimResult {
-    if (currentValue == 0 || zone.isInFirstFrame(now)) {
-      return AutoDimResult.NO_CHANGE
-    }
-
-    val calculatedLevel = calculateLightLevel(zone)
-    val delta = Math.abs(calculatedLevel - currentValue)
-    val allowed = delta <= 2
-
-    return if (allowed) AutoDimResult(calculatedLevel, delta > 1) else AutoDimResult.NO_CHANGE
-  }
-
-  /**
-   * If the lights are off, set them to the low value.
-   *
-   * If they're already on, brighten or dim them depending on how bright they currently are.
-   * Pick the level opposite of what the current value is closest to.
-   */
   fun toggleLights(zone: LightZone, currentValue: Int): ToggleLightResult {
     val calculatedLevel = calculateLightLevel(zone)
 
@@ -87,4 +58,3 @@ class DimCalculator(val now: () -> LocalTime) {
     return currentValue < calculatedLevel || currentValue >= currentHigh
   }
 }
-
