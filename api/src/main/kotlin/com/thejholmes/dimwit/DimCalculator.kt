@@ -8,17 +8,13 @@ import java.time.LocalTime
  * their endTime(s) and are stored consecutively in the List.
  */
 class DimCalculator(val now: () -> LocalTime) {
-  data class ToggleLightResult(val value: Int)
+  data class ToggleLightResult(val lowLevel: Int, val highLevel: Int)
 
-  fun toggleLights(zone: LightZone, currentValue: Int): ToggleLightResult {
+  fun toggleLights(zone: LightZone): ToggleLightResult {
     val calculatedLevel = calculateLightLevel(zone)
+    val highLevel = zone.currentFrame(now).highLevel
 
-    val lightLevel = when {
-      shouldUseCalculatedLevel(zone, currentValue, calculatedLevel) -> calculatedLevel
-      else -> zone.currentFrame(now).highLevel
-    }
-
-    return ToggleLightResult(lightLevel)
+    return ToggleLightResult(calculatedLevel, highLevel)
   }
 
   private fun calculateLightLevel(zone: LightZone): Int {
@@ -49,12 +45,5 @@ class DimCalculator(val now: () -> LocalTime) {
     }
 
     return calculatedLevel
-  }
-
-  internal fun shouldUseCalculatedLevel(zone: LightZone, currentValue: Int, calculatedLevel: Int): Boolean {
-    val currentFrame = zone.currentFrame(now)
-    val currentHigh = currentFrame.highLevel
-
-    return currentValue < calculatedLevel || currentValue >= currentHigh
   }
 }

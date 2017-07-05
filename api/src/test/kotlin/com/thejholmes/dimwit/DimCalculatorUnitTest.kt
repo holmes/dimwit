@@ -26,108 +26,36 @@ class DimCalculatorUnitTest {
     dimCalculator = DimCalculator({ now })
   }
 
-  @Test fun testToggleLightsWhenOffInFirstFrame() {
+  @Test fun testLowLevelInFirstFrame() {
     val currentFrame = zone.timeFrames[0]
 
     now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 0).value
+    val result = dimCalculator.toggleLights(zone).lowLevel
     assertThat(result).isEqualTo(10)
   }
 
-  @Test fun testToggleLightsWhenOff() {
+  @Test fun testLowLevelInMiddleFrame() {
     val currentFrame = zone.timeFrames[2]
 
     now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 0).value
+    val result = dimCalculator.toggleLights(zone).lowLevel
     assertThat(result).isEqualTo(50)
   }
 
-  @Test fun testToggleLightsWhenOffInEvening() {
+  @Test fun testLowLevelInEveningrame() {
     val currentFrame = zone.timeFrames[3]
 
     now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 0).value
+    val result = dimCalculator.toggleLights(zone).lowLevel
     assertThat(result).isEqualTo(38)
-  }
-
-  @Test fun testToggleLightsWhenWellBelowLevelTakesYouToLowLevel() {
-    val currentFrame = zone.timeFrames[2]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 32).value
-    assertThat(result).isEqualTo(50)
-  }
-
-  @Test fun testToggleLightsWhenAtLowLevel() {
-    val currentFrame = zone.timeFrames[2]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 50).value
-    assertThat(result).isEqualTo(currentFrame.highLevel)
-  }
-
-  @Test fun testToggleLightsWhenJustAboveLowLevelTakesYouToHigh() {
-    val currentFrame = zone.timeFrames[2]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 52).value
-    assertThat(result).isEqualTo(currentFrame.highLevel)
-  }
-
-  @Test fun testToggleLightsWhenAtLowLevelInEvening() {
-    val currentFrame = zone.timeFrames[3]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 38).value
-    assertThat(result).isEqualTo(currentFrame.highLevel)
-  }
-
-  @Test fun testToggleLightsWhenJustAboveLowLevelTakesYouToHighLevel() {
-    val currentFrame = zone.timeFrames[2]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, 52).value
-    assertThat(result).isEqualTo(currentFrame.highLevel)
-  }
-
-  @Test fun testToggleLightsWhenJustAboveHighLevelInEvening() {
-    val currentFrame = zone.timeFrames[3]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, currentFrame.highLevel + 3).value
-    assertThat(result).isEqualTo(38)
-  }
-
-  @Test fun testToggleLightsWhenNearHighTakesYouToHigh() {
-    val currentFrame = zone.timeFrames[2]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, currentFrame.highLevel - 2).value
-    assertThat(result).isEqualTo(85)
-  }
-
-  @Test fun testToggleLightsWhenOnHigh() {
-    val currentFrame = zone.timeFrames[2]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, currentFrame.highLevel).value
-    assertThat(result).isEqualTo(50)
   }
 
   @Test fun testKitchenLightThatWontDim() {
     val currentFrame = zone.timeFrames[3]
 
     now = currentFrame.endTime().minusMinutes(30)
-    val result = dimCalculator.toggleLights(zone, currentFrame.highLevel).value
+    val result = dimCalculator.toggleLights(zone).lowLevel
     assertThat(result).isEqualTo(33)
-  }
-
-  @Test fun testToggleLightsWhenAboveHigh() {
-    val currentFrame = zone.timeFrames[2]
-
-    now = currentFrame.endTime().minusMinutes(100)
-    val result = dimCalculator.toggleLights(zone, currentFrame.highLevel + 7).value
-    assertThat(result).isEqualTo(50)
   }
 
   @Test fun testPreviousFrame() {
