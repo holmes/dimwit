@@ -19,20 +19,27 @@ data class TimeFrame(val endTime: () -> LocalTime, val lowLevel: Int, val highLe
 }
 
 
-data class  LightZone(val timeFrames: List<TimeFrame>) {
-  fun isInFirstFrame(now: () -> LocalTime): Boolean {
+data class  LightZone(val deviceId: Int, val subZones: Set<DependentZone>, val timeFrames: List<TimeFrame>) {
+  data class DependentZone(val deviceId: Int, val timeFrames: List<DependentTimeFrame>) {
+    data class DependentTimeFrame(val startTime: () -> LocalTime, val endTime: () -> LocalTime)
+
+    fun contains(now: ()->LocalTime): Boolean {
+      return timeFrames.any { it.startTime() < now() && it.endTime() > now() }
+    }
+  }
+
+  fun isInFirstFrame(now: ()->LocalTime): Boolean {
     return timeFrames[0].contains(now())
   }
 
-  fun previousFrame(now: () -> LocalTime): TimeFrame {
+  fun previousFrame(now: ()->LocalTime): TimeFrame {
     return timeFrames.last { !it.contains(now()) }
   }
 
-  fun currentFrame(now: () -> LocalTime): TimeFrame {
+  fun currentFrame(now: ()->LocalTime): TimeFrame {
     return timeFrames.first { it.contains(now()) }
   }
 }
-
 
 class LightZones(twilight: Twilight) {
   private val zones = HashMap<Int, LightZone>()
