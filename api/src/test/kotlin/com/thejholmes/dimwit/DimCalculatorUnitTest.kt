@@ -5,7 +5,7 @@ import com.nhaarman.mockito_kotlin.doAnswer
 import com.nhaarman.mockito_kotlin.mock
 import com.thejholmes.dimwit.LightZone.DependentZone
 import com.thejholmes.dimwit.LightZone.DependentZone.DependentTimeFrame
-import com.thejholmes.dimwit.TimeFrame.Factory.StaticTimeFrame
+import com.thejholmes.dimwit.TimeFrame.Factory.staticTimeFrame
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalTime
@@ -19,18 +19,18 @@ class DimCalculatorUnitTest {
 
   @Before fun setUp() {
     val timeFrames = listOf(
-            StaticTimeFrame(MIDNIGHT.plusHours(6), 10, 35),
-            StaticTimeFrame(MIDNIGHT.plusHours(8), 30, 60),
-            StaticTimeFrame(MIDNIGHT.plusHours(13), 60, 85),
-            StaticTimeFrame(MIDNIGHT.plusHours(20), 30, 60),
-            StaticTimeFrame(MAX, 1, 35)
+            staticTimeFrame(MIDNIGHT.plusHours(6), 10, 35),
+            staticTimeFrame(MIDNIGHT.plusHours(8), 30, 60),
+            staticTimeFrame(MIDNIGHT.plusHours(13), 60, 85),
+            staticTimeFrame(MIDNIGHT.plusHours(20), 30, 60),
+            staticTimeFrame(MAX, 1, 35)
     )
 
-    zone = LightZone(11, setOf(
-            DependentZone(17, listOf(DependentTimeFrame({ MIDNIGHT }, { MIDNIGHT.plusHours(8) })))
-    ), timeFrames)
+    zone = LightZone("11", timeFrames, arrayListOf(
+            DependentZone("17", listOf(DependentTimeFrame({ MIDNIGHT }, { MIDNIGHT.plusHours(8) })))
+    ))
 
-    val childZone = LightZone(17, emptySet(), timeFrames)
+    val childZone = LightZone("17", timeFrames, emptyList())
 
     val lightZones = mock<LightZones> {
       on { zone(com.nhaarman.mockito_kotlin.any()) }.doAnswer { childZone }

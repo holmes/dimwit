@@ -28,6 +28,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     compile "org.slf4j:slf4j-api:$slf4j_version"
+    compile 'com.google.code.gson:gson:2.7'
 
     testCompile "junit:junit:$junit_version"
     testCompile "com.google.truth:truth:$truth_version"
