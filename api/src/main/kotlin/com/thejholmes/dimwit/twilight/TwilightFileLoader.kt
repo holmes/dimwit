@@ -35,16 +35,6 @@ class TwilightProvider(private val gson: Gson, private val nowProvider: () -> Lo
     private val logger = LoggerFactory.getLogger(TwilightProvider::class.java)
     private val twilightData = HashMap<LocalDate, Twilight>()
 
-    companion object Factory {
-        private val DEFAULT: Twilight = Twilight(LocalDate.now(),
-                LocalTime.of(6, 30),
-                LocalTime.of(7, 0),
-                LocalTime.of(12, 30),
-                LocalTime.of(18, 30),
-                LocalTime.of(19, 0)
-        )
-    }
-
     fun refresh() {
         val now = nowProvider()
 
@@ -62,7 +52,7 @@ class TwilightProvider(private val gson: Gson, private val nowProvider: () -> Lo
         val now = nowProvider()
         return twilightData.getOrElse(now) {
             logger.error("No twilight data for $now. Did we really load it?")
-            DEFAULT
+            Twilight.DEFAULT
         }
     }
 
@@ -81,7 +71,7 @@ class TwilightProvider(private val gson: Gson, private val nowProvider: () -> Lo
             )
         } catch (e: RuntimeException) {
             logger.error("Unable to load data for $date", e)
-            DEFAULT
+            Twilight.DEFAULT
         }
     }
 

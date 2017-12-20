@@ -1,7 +1,6 @@
 package com.thejholmes.dimwit
 
 import com.google.common.truth.Truth.assertThat
-import com.thejholmes.dimwit.twilight.FakeTwilight
 import com.thejholmes.dimwit.twilight.Twilight
 import io.reactivex.subjects.BehaviorSubject
 import org.junit.Before
@@ -25,7 +24,7 @@ class LightZoneUnitTest {
             TimeFrame(MAX.toString(), 1, 35)
     )
 
-    twilight = BehaviorSubject.createDefault(FakeTwilight.twilight)
+    twilight = BehaviorSubject.createDefault(Twilight.DEFAULT)
     now = BehaviorSubject.createDefault(of(6, 1))
 
     zone = LightZone("11", timeFrames, twilight, now)

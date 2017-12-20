@@ -3,7 +3,6 @@ package com.thejholmes.dimwit
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
 import com.thejholmes.dimwit.ParsedLightZone.ParsedTimeFrame
-import com.thejholmes.dimwit.twilight.FakeTwilight
 import com.thejholmes.dimwit.twilight.Twilight
 import io.reactivex.Observable
 import junit.framework.TestCase.fail
@@ -21,7 +20,7 @@ class LightZoneParserTest {
     @Before
     fun setUp() {
         gson = Gson()
-        twilight = FakeTwilight.twilight
+        twilight = Twilight.DEFAULT
         parser = LightZoneParser(gson, Observable.just(twilight), Observable.just(LocalTime.now()))
 
         val timeFrames = arrayOf(
@@ -102,10 +101,10 @@ class LightZoneParserTest {
         assertThat(twilight.parse("15:30")).isEqualTo(LocalTime.of(15, 30))
 
         assertThat(twilight.parse("twilightBegin:-30")).isEqualTo(LocalTime.of(6, 0))
-        assertThat(twilight.parse("sunrise:-30")).isEqualTo(LocalTime.of(8, 30))
-        assertThat(twilight.parse("solarNoon:-30")).isEqualTo(LocalTime.of(12, 15))
+        assertThat(twilight.parse("sunrise:+30")).isEqualTo(LocalTime.of(7, 30))
+        assertThat(twilight.parse("solarNoon:-15")).isEqualTo(LocalTime.of(12, 15))
         assertThat(twilight.parse("sunset:+30")).isEqualTo(LocalTime.of(19, 0))
-        assertThat(twilight.parse("twilightEnd:-14")).isEqualTo(LocalTime.of(20, 38))
+        assertThat(twilight.parse("twilightEnd:+67")).isEqualTo(LocalTime.of(20, 7))
     }
 
     @Test

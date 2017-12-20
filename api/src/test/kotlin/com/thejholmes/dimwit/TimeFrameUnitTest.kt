@@ -1,7 +1,6 @@
 package com.thejholmes.dimwit
 
 import com.google.common.truth.Truth.assertThat
-import com.thejholmes.dimwit.twilight.FakeTwilight
 import com.thejholmes.dimwit.twilight.Twilight
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +11,7 @@ class TimeFrameUnitTest {
   lateinit var now: LocalTime
 
   @Before fun setUp() {
-    twilight = FakeTwilight.twilight
+    twilight = Twilight.DEFAULT
     now = LocalTime.of(8, 0)
   }
 

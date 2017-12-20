@@ -1,8 +1,8 @@
 package com.thejholmes.dimwit
 
 import com.google.gson.Gson
-import com.thejholmes.dimwit.twilight.FakeTwilight
 import com.thejholmes.dimwit.twilight.Twilight
+import com.thejholmes.dimwit.twilight.Twilight.Companion
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.BehaviorSubject
@@ -20,7 +20,7 @@ class DimwitSample {
 
     fun doSomething() {
         // Initialize w/ some values for twilight
-        twilight.onNext(FakeTwilight.twilight)
+        twilight.onNext(Twilight.DEFAULT)
 
         val inputString = javaClass.getResource("/zone.json").readText()
         println("Your input:\n $inputString")
@@ -38,7 +38,7 @@ class DimwitSample {
                 .subscribe(localTime)
 
         // Now update Twilight and make sure we see some changes
-        val newTwilight = FakeTwilight.twilight
+        val newTwilight = Twilight.DEFAULT
                 .copy(twilightBegin = LocalTime.of(2, 12))
                 .copy(sunrise = LocalTime.of(4, 52))
                 .copy(solarNoon = LocalTime.of(9, 38))
