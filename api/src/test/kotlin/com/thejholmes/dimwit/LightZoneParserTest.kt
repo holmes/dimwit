@@ -2,10 +2,10 @@ package com.thejholmes.dimwit
 
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.doAnswer
-import com.nhaarman.mockito_kotlin.mock
+import com.thejholmes.dimwit.ParsedLightZone.ParsedTimeFrame
+import com.thejholmes.dimwit.twilight.FakeTwilight
 import com.thejholmes.dimwit.twilight.Twilight
+import io.reactivex.Observable
 import junit.framework.TestCase.fail
 import org.junit.Before
 import org.junit.Test
@@ -21,14 +21,8 @@ class LightZoneParserTest {
     @Before
     fun setUp() {
         gson = Gson()
-        twilight = mock {
-            on { twilightBegin(any()) }.doAnswer { { LocalTime.of(4, 0) } }
-            on { sunrise(any()) }.doAnswer { { LocalTime.of(6, 0) } }
-            on { solarNoon(any()) }.doAnswer { { LocalTime.of(12, 0) } }
-            on { sunset(any()) }.doAnswer { { LocalTime.of(20, 0) } }
-            on { twilightEnd(any()) }.doAnswer { { LocalTime.of(22, 0) } }
-        }
-        parser = LightZoneParser(gson, twilight)
+        twilight = FakeTwilight.twilight
+        parser = LightZoneParser(gson, Observable.just(twilight), Observable.just(LocalTime.now()))
 
         val timeFrames = arrayOf(
                 ParsedTimeFrame("sunrise:-30", 12, 32),
@@ -36,11 +30,7 @@ class LightZoneParserTest {
                 ParsedTimeFrame("15:00", 80, 100),
                 ParsedTimeFrame("sunset:30", 32, 64)
         )
-        val dependentZones = arrayOf(
-                ParsedDependentZone("12", arrayOf(
-                        ParsedDependentTimeFrame("sunrise:-30", "sunrise:+30")))
-        )
-        zone = ParsedLightZone("AAA", timeFrames, dependentZones)
+        zone = ParsedLightZone("AAA", timeFrames)
     }
 
     @Test
@@ -48,7 +38,7 @@ class LightZoneParserTest {
         val timeFrames = arrayOf(
                 ParsedTimeFrame("blahblah:30", 32, 64)
         )
-        zone = ParsedLightZone("AAA", timeFrames, emptyArray())
+        zone = ParsedLightZone("AAA", timeFrames)
         val zoneJson = gson.toJson(zone)
 
         try {
@@ -64,7 +54,7 @@ class LightZoneParserTest {
         val timeFrames = arrayOf(
                 ParsedTimeFrame(":30", 32, 64)
         )
-        zone = ParsedLightZone("AAA", timeFrames, emptyArray())
+        zone = ParsedLightZone("AAA", timeFrames)
         val zoneJson = gson.toJson(zone)
 
         try {
@@ -80,7 +70,7 @@ class LightZoneParserTest {
         val timeFrames = arrayOf(
                 ParsedTimeFrame("78:30", 32, 64)
         )
-        zone = ParsedLightZone("AAA", timeFrames, emptyArray())
+        zone = ParsedLightZone("AAA", timeFrames)
         val zoneJson = gson.toJson(zone)
 
         try {
@@ -96,7 +86,7 @@ class LightZoneParserTest {
         val timeFrames = arrayOf(
                 ParsedTimeFrame("6:78", 32, 64)
         )
-        zone = ParsedLightZone("AAA", timeFrames, emptyArray())
+        zone = ParsedLightZone("AAA", timeFrames)
         val zoneJson = gson.toJson(zone)
 
         try {
@@ -109,13 +99,13 @@ class LightZoneParserTest {
 
     @Test
     fun twilightParser() {
-        assertThat(twilight.parse("15:30")()).isEqualTo(LocalTime.of(15, 30))
+        assertThat(twilight.parse("15:30")).isEqualTo(LocalTime.of(15, 30))
 
-        assertThat(twilight.parse("twilightBegin:-30")()).isEqualTo(LocalTime.of(4, 0))
-        assertThat(twilight.parse("sunrise:-30")()).isEqualTo(LocalTime.of(6, 0))
-        assertThat(twilight.parse("solarNoon:-30")()).isEqualTo(LocalTime.of(12, 0))
-        assertThat(twilight.parse("sunset:-30")()).isEqualTo(LocalTime.of(20, 0))
-        assertThat(twilight.parse("twilightEnd:-30")()).isEqualTo(LocalTime.of(22, 0))
+        assertThat(twilight.parse("twilightBegin:-30")).isEqualTo(LocalTime.of(6, 0))
+        assertThat(twilight.parse("sunrise:-30")).isEqualTo(LocalTime.of(8, 30))
+        assertThat(twilight.parse("solarNoon:-30")).isEqualTo(LocalTime.of(12, 15))
+        assertThat(twilight.parse("sunset:+30")).isEqualTo(LocalTime.of(19, 0))
+        assertThat(twilight.parse("twilightEnd:-14")).isEqualTo(LocalTime.of(20, 38))
     }
 
     @Test
@@ -128,28 +118,21 @@ class LightZoneParserTest {
 
         // Being lazy and just testing the first one.
         val timeFrame = convertedZone.timeFrames.first()
-        assertThat(timeFrame.endTime()).isEqualTo(LocalTime.of(6, 0))
+        assertThat(timeFrame.endTimeValue).isEqualTo("sunrise:-30")
         assertThat(timeFrame.lowLevel).isEqualTo(12)
         assertThat(timeFrame.highLevel).isEqualTo(32)
-
-        // More laziness.
-        assertThat(convertedZone.subZones).hasSize(1)
-        val dependentZone = convertedZone.subZones.first()
-        assertThat(dependentZone.deviceId).isEqualTo("12")
-        assertThat(dependentZone.contains { LocalTime.NOON })
     }
 
     @Test
     fun convertToZoneWithTimes() {
-        val lightZone = zone.lightZone(twilight)
+        val lightZone = zone.lightZone(Observable.just(twilight), Observable.just(LocalTime.now()))
         assertThat(lightZone.deviceId).isEqualTo("AAA")
         assertThat(lightZone.timeFrames).hasSize(4)
-        assertThat(lightZone.subZones).hasSize(1)
 
         val timeFrames = lightZone.timeFrames
         val firstFrame = timeFrames[0]
         assertThat(firstFrame.lowLevel).isEqualTo(12)
         assertThat(firstFrame.highLevel).isEqualTo(32)
-        assertThat(firstFrame.endTime()).isEqualTo(LocalTime.of(6, 0))
+        assertThat(firstFrame.endTimeValue).isEqualTo("sunrise:-30")
     }
 }

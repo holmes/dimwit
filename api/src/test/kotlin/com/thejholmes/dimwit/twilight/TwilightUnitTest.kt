@@ -27,65 +27,65 @@ class TwilightUnitTest {
     val twilightEnd = LocalTime.of(18, 21)
 
     twilightResult = TwilightResult(LocalDate.now(), twilightBegin, sunrise, solarNoon, sunset, twilightEnd)
-    twilight = Twilight({ twilightResult })
+    twilight = Twilight(twilightResult)
   }
 
   @Test fun testSunrise() {
-    val sunrise = twilight.sunrise()()
+    val sunrise = twilight.sunrise()
     assertThat(sunrise.hour).isEqualTo(7)
     assertThat(sunrise.minute).isEqualTo(21)
   }
 
   @Test fun testSunriseOffset() {
-    val sunrise = twilight.sunrise(-30)()
+    val sunrise = twilight.sunrise(-30)
     assertThat(sunrise.hour).isEqualTo(6)
     assertThat(sunrise.minute).isEqualTo(51)
   }
 
   @Test fun testSolarNoon() {
-    val solarNoon = twilight.solarNoon()()
+    val solarNoon = twilight.solarNoon()
     assertThat(solarNoon.hour).isEqualTo(12)
     assertThat(solarNoon.minute).isEqualTo(26)
   }
 
   @Test fun testSolarNoonOffset() {
-    val solarNoon = twilight.solarNoon(-30)()
+    val solarNoon = twilight.solarNoon(-30)
     assertThat(solarNoon.hour).isEqualTo(11)
     assertThat(solarNoon.minute).isEqualTo(56)
   }
 
   @Test fun testSunset() {
-    val sunset = twilight.sunset()()
+    val sunset = twilight.sunset()
     assertThat(sunset.hour).isEqualTo(17)
     assertThat(sunset.minute).isEqualTo(41)
   }
 
   @Test fun testSunsetOffset() {
-    val sunset = twilight.sunset(30)()
+    val sunset = twilight.sunset(30)
     assertThat(sunset.hour).isEqualTo(18)
     assertThat(sunset.minute).isEqualTo(11)
   }
 
   @Test fun testTwilightBegin() {
-    val localTime = twilight.twilightBegin()()
+    val localTime = twilight.twilightBegin()
     assertThat(localTime.hour).isEqualTo(6)
     assertThat(localTime.minute).isEqualTo(58)
   }
 
   @Test fun testTwilightBeginOffset() {
-    val localTime = twilight.twilightBegin(-30)()
+    val localTime = twilight.twilightBegin(-30)
     assertThat(localTime.hour).isEqualTo(6)
     assertThat(localTime.minute).isEqualTo(28)
   }
 
   @Test fun testTwilightEnd() {
-    val localTime = twilight.twilightEnd()()
+    val localTime = twilight.twilightEnd()
     assertThat(localTime.hour).isEqualTo(18)
     assertThat(localTime.minute).isEqualTo(21)
   }
 
   @Test fun testTwilightEndOffset() {
-    val localTime = twilight.twilightEnd(30)()
+    val localTime = twilight.twilightEnd(30)
     assertThat(localTime.hour).isEqualTo(18)
     assertThat(localTime.minute).isEqualTo(51)
   }

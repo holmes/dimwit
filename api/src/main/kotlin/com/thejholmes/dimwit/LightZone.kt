@@ -1,20 +1,24 @@
 package com.thejholmes.dimwit
 
+import com.thejholmes.dimwit.twilight.Twilight
+import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import java.time.Duration
 import java.time.LocalTime
+
+data class LightLevels(val lowLevel: Int, val highLevel: Int)
 
 /**
  * A TimeFrame is a description of a light level. These are stacked together to
  * represent how we want to light up a room at a certain time of day.
  */
-data class TimeFrame(val endTime: () -> LocalTime, val lowLevel: Int, val highLevel: Int) {
-  fun contains(currentTime: LocalTime): Boolean = endTime().isAfter(currentTime)
-
-  companion object Factory {
-    fun staticTimeFrame(time: LocalTime, lowLevel: Int, highLevel: Int): TimeFrame
-            = TimeFrame({ time }, lowLevel, highLevel)
-  }
+data class TimeFrame(val endTimeValue: String, val lowLevel: Int, val highLevel: Int) {
+    internal fun contains(twilight: Twilight, now: LocalTime): Boolean {
+        return twilight.parse(endTimeValue).isAfter(now)
+    }
 }
+
+data class ConvertedTimeFrame(val endTime: LocalTime, val lowLevel: Int, val highLevel: Int)
 
 /**
  * A LightZone contains a list of {@link TimeFrame}s. Given a time, the LightZone can calculate
@@ -24,57 +28,62 @@ data class TimeFrame(val endTime: () -> LocalTime, val lowLevel: Int, val highLe
  * In practice: if I turn on the family room lights between midnight -> sunrise then I also want to
  * turn on the kitchen lights, because that's probably where I'm going.
  */
-data class  LightZone(val deviceId: String, val timeFrames: List<TimeFrame>, val subZones: List<DependentZone>) {
-  data class DependentZone(val deviceId: String, private val timeFrames: List<DependentTimeFrame>) {
-    data class DependentTimeFrame(val startTime: () -> LocalTime, val endTime: () -> LocalTime)
-    fun contains(now: ()->LocalTime): Boolean =
-            timeFrames.any { it.startTime() < now() && it.endTime() > now() }
-  }
+data class LightZone(
+        val deviceId: String,
+        val timeFrames: List<TimeFrame>,
+        val twilight: Observable<Twilight>,
+        val now: Observable<LocalTime>
+) {
+    val lightLevels: Observable<LightLevels> = Observable
+            .combineLatest(now, twilight,
+                    BiFunction { now, twilight -> calculateLevels(twilight, now) })
 
-  fun highLevel(now: () -> LocalTime): Int {
-    return currentFrame(now).highLevel
-  }
+    internal fun calculateLevels(twilight: Twilight, now: LocalTime): LightLevels {
+        // Always use lowLevel in the morning.
+        if (isInFirstFrame(twilight, now)) {
+            val first = timeFrames.first()
+            return LightLevels(first.lowLevel, first.highLevel)
+        }
 
-  fun calculateLightLevel(now: () -> LocalTime): Int {
-    // Always use lowLevel in the morning.
-    if (isInFirstFrame(now)) {
-      return timeFrames.first().lowLevel
+        val previousFrame = previousFrame(twilight, now)
+        val currentFrame = currentFrame(twilight, now)
+
+        val startValue = previousFrame.lowLevel
+        val endValue = currentFrame(twilight, now).lowLevel
+
+        val startTime = previousFrame.endTime
+        val endTime = currentFrame.endTime
+
+        val frameLength = Duration.between(startTime, endTime)
+        val inset = Duration.between(startTime, now)
+        val ratio: Double = (inset.toMinutes().toDouble() / frameLength.toMinutes().toDouble())
+        val adjustedRatio = (Math.abs(startValue - endValue) * ratio).toInt()
+
+        var calculatedLevel: Int
+        if (startValue > endValue) {
+            calculatedLevel = Math.abs(adjustedRatio - startValue)
+            calculatedLevel = Math.max(calculatedLevel, endValue)
+        } else {
+            calculatedLevel = adjustedRatio + startValue
+            calculatedLevel = Math.max(calculatedLevel, startValue)
+        }
+
+        return LightLevels(calculatedLevel, currentFrame.highLevel)
     }
 
-    val startValue = previousFrame(now).lowLevel
-    val endValue = currentFrame(now).lowLevel
-
-    val startTime = previousFrame(now).endTime()
-    val endTime = currentFrame(now).endTime()
-    val nowTime = now()
-
-    val frameLength = Duration.between(startTime, endTime)
-    val inset = Duration.between(startTime, nowTime)
-    val ratio: Double = (inset.toMinutes().toDouble() / frameLength.toMinutes().toDouble())
-    val adjustedRatio = (Math.abs(startValue - endValue) * ratio).toInt()
-
-    var calculatedLevel: Int
-    if (startValue > endValue) {
-      calculatedLevel = Math.abs(adjustedRatio - startValue)
-      calculatedLevel = Math.max(calculatedLevel, endValue)
-    } else {
-      calculatedLevel = adjustedRatio + startValue
-      calculatedLevel = Math.max(calculatedLevel, startValue)
+    private fun isInFirstFrame(twilight: Twilight, now: LocalTime): Boolean {
+        return timeFrames[0].contains(twilight, now)
     }
 
-    return calculatedLevel
-  }
+    private fun previousFrame(twilight: Twilight, now: LocalTime): ConvertedTimeFrame {
+        return with(timeFrames.last { !it.contains(twilight, now) }) {
+            ConvertedTimeFrame(twilight.parse(endTimeValue), lowLevel, highLevel)
+        }
+    }
 
-  fun isInFirstFrame(now: ()->LocalTime): Boolean = timeFrames[0].contains(now())
-
-  fun previousFrame(now: ()->LocalTime): TimeFrame = timeFrames.last { !it.contains(now()) }
-
-  fun currentFrame(now: ()->LocalTime): TimeFrame = timeFrames.first { it.contains(now()) }
-}
-
-/** Simple store of all the {@link LightZone}s. Query them with {@link #zone}. */
-class LightZones {
-  private val zones = HashMap<String, LightZone>()
-
-  fun zone(deviceId: String): LightZone? = zones[deviceId]
+    private fun currentFrame(twilight: Twilight, now: LocalTime): ConvertedTimeFrame {
+        return with(timeFrames.first { it.contains(twilight, now) }) {
+            ConvertedTimeFrame(twilight.parse(endTimeValue), lowLevel, highLevel)
+        }
+    }
 }

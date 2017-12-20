@@ -29,8 +29,10 @@ dependencies {
 
     compile "org.slf4j:slf4j-api:$slf4j_version"
     compile 'com.google.code.gson:gson:2.7'
+    compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.7'
 
-    testCompile "junit:junit:$junit_version"
+
+  testCompile "junit:junit:$junit_version"
     testCompile "com.google.truth:truth:$truth_version"
     testCompile "org.mockito:mockito-core:$mockito_core_version"
     testCompile "com.nhaarman:mockito-kotlin:$mockito_kotlin_version"
