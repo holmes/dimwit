@@ -36,7 +36,8 @@ data class LightZone(
 ) {
     val lightLevels: Observable<LightLevels> = Observable
             .combineLatest(now, twilight,
-                    BiFunction { now, twilight -> calculateLevels(twilight, now) })
+                    BiFunction<LocalTime, Twilight, LightLevels> { now, twilight -> calculateLevels(twilight, now) })
+            .distinctUntilChanged()
 
     internal fun calculateLevels(twilight: Twilight, now: LocalTime): LightLevels {
         // Always use lowLevel in the morning.

@@ -3,11 +3,9 @@ package com.thejholmes.dimwit
 import com.google.common.truth.Truth.assertThat
 import com.thejholmes.dimwit.twilight.FakeTwilight
 import com.thejholmes.dimwit.twilight.Twilight
-import com.thejholmes.dimwit.twilight.TwilightResult
 import io.reactivex.subjects.BehaviorSubject
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.LocalTime.MAX
 import java.time.LocalTime.MIDNIGHT

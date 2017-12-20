@@ -1,0 +1,30 @@
+{
+  "deviceId": "AAA",
+  "timeFrames": [
+    {
+      "endTime": "sunrise:-30",
+      "lowLevel": 12,
+      "highLevel": 32
+    },
+    {
+      "endTime": "solarNoon:0",
+      "lowLevel": 80,
+      "highLevel": 100
+    },
+    {
+      "endTime": "15:00",
+      "lowLevel": 80,
+      "highLevel": 100
+    },
+    {
+      "endTime": "sunset:30",
+      "lowLevel": 32,
+      "highLevel": 64
+    },
+    {
+      "endTime": "23:59",
+      "lowLevel": 10,
+      "highLevel": 24
+    }
+  ]
+}
