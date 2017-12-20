@@ -1,6 +1,5 @@
 package com.thejholmes.dimwit
 
-import com.thejholmes.dimwit.twilight.Twilight
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import java.time.Duration

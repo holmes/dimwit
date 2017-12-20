@@ -1,6 +1,8 @@
-package com.thejholmes.dimwit.twilight
+package com.thejholmes.dimwit
 
 import com.google.gson.Gson
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
@@ -30,14 +32,17 @@ import java.time.format.DateTimeFormatter
  * }
  * </code>
  */
-class TwilightProvider(private val gson: Gson, private val nowProvider: () -> LocalDate,
-        private val dataLocation: File) {
+class TwilightProvider(private val gson: Gson, private val dataLocation: File) {
     private val logger = LoggerFactory.getLogger(TwilightProvider::class.java)
     private val twilightData = HashMap<LocalDate, Twilight>()
 
-    fun refresh() {
-        val now = nowProvider()
+    fun start(now: Observable<LocalDate>): Disposable {
+        return now
+                .distinctUntilChanged()
+                .subscribe(this::refresh)
+    }
 
+    internal fun refresh(now: LocalDate) {
         // Trim old stuff first.
         twilightData
                 .filterKeys { it.isBefore(now) }
@@ -48,15 +53,14 @@ class TwilightProvider(private val gson: Gson, private val nowProvider: () -> Lo
         loadData(now.plusDays(1)).apply { twilightData.put(date, this) }
     }
 
-    fun twilight(): Twilight {
-        val now = nowProvider()
+    internal fun twilight(now: LocalDate): Twilight {
         return twilightData.getOrElse(now) {
             logger.error("No twilight data for $now. Did we really load it?")
             Twilight.DEFAULT
         }
     }
 
-    internal fun loadData(date: LocalDate): Twilight {
+    private fun loadData(date: LocalDate): Twilight {
         return try {
             val inputStream = getFileStream(date)
             val sunriseData = gson.fromJson(inputStream.bufferedReader(),

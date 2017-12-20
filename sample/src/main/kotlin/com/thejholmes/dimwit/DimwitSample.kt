@@ -1,8 +1,6 @@
 package com.thejholmes.dimwit
 
 import com.google.gson.Gson
-import com.thejholmes.dimwit.twilight.Twilight
-import com.thejholmes.dimwit.twilight.Twilight.Companion
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.BehaviorSubject

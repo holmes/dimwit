@@ -3,7 +3,6 @@ package com.thejholmes.dimwit
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
 import com.thejholmes.dimwit.ParsedLightZone.ParsedTimeFrame
-import com.thejholmes.dimwit.twilight.Twilight
 import io.reactivex.Observable
 import junit.framework.TestCase.fail
 import org.junit.Before

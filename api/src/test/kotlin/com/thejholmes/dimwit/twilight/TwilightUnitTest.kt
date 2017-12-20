@@ -1,6 +1,7 @@
 package com.thejholmes.dimwit.twilight
 
 import com.google.common.truth.Truth.assertThat
+import com.thejholmes.dimwit.Twilight
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
@@ -26,7 +27,8 @@ class TwilightUnitTest {
         // Twilight ends at 18:21
         val twilightEnd = LocalTime.of(18, 21)
 
-        twilight = Twilight(LocalDate.now(), twilightBegin, sunrise, solarNoon, sunset, twilightEnd)
+        twilight = Twilight(LocalDate.now(), twilightBegin, sunrise,
+                solarNoon, sunset, twilightEnd)
     }
 
     @Test

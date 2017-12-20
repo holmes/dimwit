@@ -1,4 +1,4 @@
-package com.thejholmes.dimwit.twilight
+package com.thejholmes.dimwit
 
 import java.time.LocalDate
 import java.time.LocalTime
@@ -27,7 +27,8 @@ data class Twilight(val date: LocalDate, val twilightBegin: LocalTime, val sunri
     }
 
     companion object {
-        val DEFAULT: Twilight = Twilight(LocalDate.now(),
+        val DEFAULT: Twilight = Twilight(
+                LocalDate.now(),
                 LocalTime.of(6, 30),
                 LocalTime.of(7, 0),
                 LocalTime.of(12, 30),

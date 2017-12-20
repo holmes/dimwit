@@ -1,7 +1,6 @@
 package com.thejholmes.dimwit
 
 import com.google.common.truth.Truth.assertThat
-import com.thejholmes.dimwit.twilight.Twilight
 import io.reactivex.subjects.BehaviorSubject
 import org.junit.Before
 import org.junit.Test

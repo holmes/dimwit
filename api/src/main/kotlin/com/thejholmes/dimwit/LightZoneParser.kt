@@ -1,7 +1,6 @@
 package com.thejholmes.dimwit
 
 import com.google.gson.Gson
-import com.thejholmes.dimwit.twilight.Twilight
 import io.reactivex.Observable
 import java.time.DateTimeException
 import java.time.LocalTime
