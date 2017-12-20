@@ -1,0 +1,15 @@
+{
+  "results": {
+    "sunrise": "2017-02-12T15:00:21+00:00",
+    "sunset": "2017-02-13T01:44:56+00:00",
+    "solar_noon": "2017-02-12T20:22:39+00:00",
+    "day_length": 38675,
+    "civil_twilight_begin": "2017-02-12T14:33:27+00:00",
+    "civil_twilight_end": "2017-02-13T02:11:51+00:00",
+    "nautical_twilight_begin": "2017-02-12T14:02:35+00:00",
+    "nautical_twilight_end": "2017-02-13T02:42:43+00:00",
+    "astronomical_twilight_begin": "2017-02-12T13:32:02+00:00",
+    "astronomical_twilight_end": "2017-02-13T03:13:16+00:00"
+  },
+  "status": "OK"
+}

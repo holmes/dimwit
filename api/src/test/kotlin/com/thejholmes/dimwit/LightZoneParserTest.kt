@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doAnswer
 import com.nhaarman.mockito_kotlin.mock
+import com.thejholmes.dimwit.twilight.Twilight
 import junit.framework.TestCase.fail
 import org.junit.Before
 import org.junit.Test

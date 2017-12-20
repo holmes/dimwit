@@ -31,6 +31,10 @@ data class  LightZone(val deviceId: String, val timeFrames: List<TimeFrame>, val
             timeFrames.any { it.startTime() < now() && it.endTime() > now() }
   }
 
+  fun highLevel(now: () -> LocalTime): Int {
+    return currentFrame(now).highLevel
+  }
+
   fun calculateLightLevel(now: () -> LocalTime): Int {
     // Always use lowLevel in the morning.
     if (isInFirstFrame(now)) {

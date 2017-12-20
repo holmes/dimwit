@@ -3,6 +3,7 @@ package com.thejholmes.dimwit
 import com.google.gson.Gson
 import com.thejholmes.dimwit.LightZone.DependentZone
 import com.thejholmes.dimwit.LightZone.DependentZone.DependentTimeFrame
+import com.thejholmes.dimwit.twilight.Twilight
 import java.time.DateTimeException
 import java.time.LocalTime
 import java.time.format.DateTimeParseException
@@ -16,7 +17,7 @@ import kotlin.math.absoluteValue
  * The idea is that a configuration file is loaded once, but the times must be calculated multiple
  * times on different days, and thus will have different times.
  */
-class LightZoneParser(private val gson: Gson, private val twilight: Twilight) {
+class LightZoneParser(val gson: Gson, val twilight: Twilight) {
     fun parse(input: String): LightZone {
         val parsedZone = gson.fromJson(input, ParsedLightZone::class.java)
         return parsedZone.lightZone(twilight)
@@ -30,10 +31,10 @@ data class ParsedTimeFrame(val endTime: String, val lowLevel: Int, val highLevel
 }
 
 data class ParsedLightZone(val deviceId: String, val timeFrames: Array<ParsedTimeFrame>,
-        val subZones: Array<ParsedDependentZone>) {
+        val subZones: Array<ParsedDependentZone>?) {
     fun lightZone(twilight: Twilight): LightZone {
         return LightZone(deviceId, timeFrames.map { it.timeFrame(twilight) },
-                subZones.map { it.lightZone(twilight) })
+                subZones?.map { it.lightZone(twilight) } ?: emptyList())
     }
 
     override fun equals(other: Any?): Boolean {
