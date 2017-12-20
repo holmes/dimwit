@@ -1,37 +1,37 @@
 package com.thejholmes.dimwit
 
+import com.google.gson.Gson
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.disposables.Disposables
-import org.slf4j.LoggerFactory
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit.DAYS
 import java.util.concurrent.TimeUnit.MINUTES
 
-class LightZoneManager(twilightProvider: TwilightProvider) {
-    private val logger = LoggerFactory.getLogger(LightZoneManager::class.java)
+class LightZoneManager(gson: Gson, dataLocation: File) {
+    private val now: Observable<LocalTime>
+    private val today: Observable<LocalDate>
+    private var subscription = CompositeDisposable()
 
-    val now: Observable<LocalTime>
-    val today: Observable<LocalDate>
-    val twilight: Observable<Twilight>
-
-    var subscription = Disposables.empty()
+    val parser: LightZoneParser
 
     init {
         now = Observable
-                .interval(1, MINUTES)
+                .interval(0, 1, MINUTES)
                 .map { LocalTime.now() }
-                .doOnNext { logger.debug("Time is now: {}", it) }
+                .distinctUntilChanged()
 
         today = Observable
-                .interval(1, DAYS)
+                .interval(0, 1, DAYS)
                 .map { LocalDate.now() }
                 .distinctUntilChanged()
-                .doOnNext { logger.debug("Today is now: {}", it) }
 
-        twilight = twilightProvider.twilight
+        val twilightProvider = TwilightProvider(gson, dataLocation, today)
+        val twilight = twilightProvider.twilight
+
+        parser = LightZoneParser(gson, twilight, now)
     }
 
     fun start() {
@@ -47,6 +47,6 @@ class LightZoneManager(twilightProvider: TwilightProvider) {
     }
 }
 
-private fun Disposable.addTo(disposable: Disposable) {
-    this.addTo(disposable)
+private fun Disposable.addTo(disposable: CompositeDisposable) {
+    disposable.add(this)
 }

@@ -32,13 +32,13 @@ import java.time.format.DateTimeFormatter
  * </code>
  */
 class TwilightProvider(private val gson: Gson, private val dataLocation: File,
-        now: Observable<LocalDate>) {
+        today: Observable<LocalDate>) {
     private val logger = LoggerFactory.getLogger(TwilightProvider::class.java)
     val twilightData = HashMap<LocalDate, Twilight>()
     val twilight: Observable<Twilight>
 
     init {
-        twilight = now.map { date ->
+        twilight = today.map { date ->
             refresh(date)
 
             twilightData.getOrElse(date) {

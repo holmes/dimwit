@@ -15,7 +15,11 @@ import kotlin.math.absoluteValue
  * The idea is that a configuration file is loaded once, but the times must be calculated multiple
  * times on different days, and thus will have different times.
  */
-class LightZoneParser(val gson: Gson, val twilight: Observable<Twilight>, val now: Observable<LocalTime>) {
+class LightZoneParser(
+        private val gson: Gson,
+        private val twilight: Observable<Twilight>,
+        private val now: Observable<LocalTime>
+) {
     fun parse(input: String): LightZone {
         val parsedZone = gson.fromJson(input, ParsedLightZone::class.java)
         return parsedZone.lightZone(twilight, now)
