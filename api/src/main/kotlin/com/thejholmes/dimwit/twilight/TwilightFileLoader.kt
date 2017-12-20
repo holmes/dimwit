@@ -33,10 +33,10 @@ import java.time.format.DateTimeFormatter
 class TwilightProvider(private val gson: Gson, private val nowProvider: () -> LocalDate,
         private val dataLocation: File) {
     private val logger = LoggerFactory.getLogger(TwilightProvider::class.java)
-    private val twilightData = HashMap<LocalDate, TwilightResult>()
+    private val twilightData = HashMap<LocalDate, Twilight>()
 
     companion object Factory {
-        private val DEFAULT: TwilightResult = TwilightResult(LocalDate.now(),
+        private val DEFAULT: Twilight = Twilight(LocalDate.now(),
                 LocalTime.of(6, 30),
                 LocalTime.of(7, 0),
                 LocalTime.of(12, 30),
@@ -58,7 +58,7 @@ class TwilightProvider(private val gson: Gson, private val nowProvider: () -> Lo
         loadData(now.plusDays(1)).apply { twilightData.put(date, this) }
     }
 
-    fun twilight(): TwilightResult {
+    fun twilight(): Twilight {
         val now = nowProvider()
         return twilightData.getOrElse(now) {
             logger.error("No twilight data for $now. Did we really load it?")
@@ -66,13 +66,13 @@ class TwilightProvider(private val gson: Gson, private val nowProvider: () -> Lo
         }
     }
 
-    internal fun loadData(date: LocalDate): TwilightResult {
+    internal fun loadData(date: LocalDate): Twilight {
         return try {
             val inputStream = getFileStream(date)
             val sunriseData = gson.fromJson(inputStream.bufferedReader(),
                     SunriseSunsetProvider::class.java)
 
-            TwilightResult(date,
+            Twilight(date,
                     sunriseData.results.civil_twilight_begin.toLocalTime(),
                     sunriseData.results.sunrise.toLocalTime(),
                     sunriseData.results.solar_noon.toLocalTime(),

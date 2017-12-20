@@ -38,7 +38,7 @@ class DimwitSample {
                 .subscribe(localTime)
 
         // Now update Twilight and make sure we see some changes
-        val newTwilight = FakeTwilight.twilightResults
+        val newTwilight = FakeTwilight.twilight
                 .copy(twilightBegin = LocalTime.of(2, 12))
                 .copy(sunrise = LocalTime.of(4, 52))
                 .copy(solarNoon = LocalTime.of(9, 38))
@@ -46,7 +46,7 @@ class DimwitSample {
                 .copy(sunset = LocalTime.of(23, 8))
 
         println("Should see another update:")
-        twilight.onNext(Twilight(newTwilight))
+        twilight.onNext(newTwilight)
 
         Thread.sleep(3000)
     }
