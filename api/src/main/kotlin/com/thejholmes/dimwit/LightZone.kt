@@ -3,9 +3,11 @@ package com.thejholmes.dimwit
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
-data class LightLevels(val lowLevel: Int, val highLevel: Int)
+data class LightLevels(val now: LocalDateTime, val lowLevel: Int, val highLevel: Int)
 
 /**
  * A TimeFrame is a description of a light level. These are stacked together to
@@ -41,7 +43,7 @@ data class LightZone(
         // Always use lowLevel in the morning.
         if (isInFirstFrame(twilight, now)) {
             val first = timeFrames.first()
-            return LightLevels(first.lowLevel, first.highLevel)
+            return LightLevels(LocalDateTime.of(twilight.date, now), first.lowLevel, first.highLevel)
         }
 
         val previousFrame = previousFrame(twilight, now)
@@ -67,7 +69,7 @@ data class LightZone(
             calculatedLevel = Math.max(calculatedLevel, startValue)
         }
 
-        return LightLevels(calculatedLevel, currentFrame.highLevel)
+        return LightLevels(LocalDateTime.of(twilight.date, now), calculatedLevel, currentFrame.highLevel)
     }
 
     private fun isInFirstFrame(twilight: Twilight, now: LocalTime): Boolean {

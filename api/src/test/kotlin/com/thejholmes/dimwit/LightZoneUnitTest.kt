@@ -31,7 +31,7 @@ class LightZoneUnitTest {
 
   @Test fun firstZone() {
     now.onNext(of(2, 10))
-    val (lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
+    val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
 
     assertThat(lowLevel).isEqualTo(10)
     assertThat(highLevel).isEqualTo(35)
@@ -39,7 +39,7 @@ class LightZoneUnitTest {
 
   @Test fun lastZone() {
     now.onNext(of(23, 59))
-    val (lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
+    val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
 
     assertThat(lowLevel).isEqualTo(1)
     assertThat(highLevel).isEqualTo(35)
@@ -47,7 +47,7 @@ class LightZoneUnitTest {
 
   @Test fun justBeforeBorder() {
     now.onNext(of(12, 59))
-    val (lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
+    val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
 
     assertThat(lowLevel).isEqualTo(59)
     assertThat(highLevel).isEqualTo(85)
@@ -55,7 +55,7 @@ class LightZoneUnitTest {
 
   @Test fun onBorder() {
     now.onNext(of(13, 0))
-    val (lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
+    val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
 
     assertThat(lowLevel).isEqualTo(60)
     assertThat(highLevel).isEqualTo(60)
@@ -63,7 +63,7 @@ class LightZoneUnitTest {
 
   @Test fun justAfterBorder() {
     now.onNext(of(13, 1))
-    val (lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
+    val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
 
     assertThat(lowLevel).isEqualTo(60)
     assertThat(highLevel).isEqualTo(60)
@@ -71,7 +71,7 @@ class LightZoneUnitTest {
 
   @Test fun slightlyAfterBorder() {
     now.onNext(of(13, 30))
-    val (lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
+    val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
 
     assertThat(lowLevel).isEqualTo(58)
     assertThat(highLevel).isEqualTo(60)

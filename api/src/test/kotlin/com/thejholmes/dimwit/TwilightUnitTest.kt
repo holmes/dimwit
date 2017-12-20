@@ -1,4 +1,4 @@
-package com.thejholmes.dimwit.twilight
+package com.thejholmes.dimwit
 
 import com.google.common.truth.Truth.assertThat
 import com.thejholmes.dimwit.Twilight

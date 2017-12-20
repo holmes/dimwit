@@ -2,7 +2,6 @@ package com.thejholmes.dimwit
 
 import com.google.gson.Gson
 import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
@@ -32,32 +31,35 @@ import java.time.format.DateTimeFormatter
  * }
  * </code>
  */
-class TwilightProvider(private val gson: Gson, private val dataLocation: File) {
+class TwilightProvider(private val gson: Gson, private val dataLocation: File,
+        now: Observable<LocalDate>) {
     private val logger = LoggerFactory.getLogger(TwilightProvider::class.java)
-    private val twilightData = HashMap<LocalDate, Twilight>()
+    val twilightData = HashMap<LocalDate, Twilight>()
+    val twilight: Observable<Twilight>
 
-    fun start(now: Observable<LocalDate>): Disposable {
-        return now
-                .distinctUntilChanged()
-                .subscribe(this::refresh)
+    init {
+        twilight = now.map { date ->
+            refresh(date)
+
+            twilightData.getOrElse(date) {
+                logger.error("No twilight data for $date. Did we really load it?")
+                Twilight.DEFAULT
+            }
+        }
     }
 
-    internal fun refresh(now: LocalDate) {
+    private fun refresh(now: LocalDate) {
         // Trim old stuff first.
         twilightData
                 .filterKeys { it.isBefore(now) }
                 .forEach { date, _ -> twilightData.remove(date) }
 
+        // Load today and tomorrow's data just in case we somehow land on a date boundary.
         logger.info("Loading twilight data from $dataLocation")
-        loadData(now).apply { twilightData.put(date, this) }
-        loadData(now.plusDays(1)).apply { twilightData.put(date, this) }
-    }
-
-    internal fun twilight(now: LocalDate): Twilight {
-        return twilightData.getOrElse(now) {
-            logger.error("No twilight data for $now. Did we really load it?")
-            Twilight.DEFAULT
-        }
+        arrayOf(now, now.plusDays(1))
+                .forEach { date ->
+                    loadData(date).apply { twilightData.put(this.date, this) }
+                }
     }
 
     private fun loadData(date: LocalDate): Twilight {

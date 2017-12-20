@@ -8,7 +8,7 @@
     },
     {
       "endTime": "solarNoon:0",
-      "lowLevel": 80,
+      "lowLevel": 60,
       "highLevel": 100
     },
     {
@@ -18,8 +18,13 @@
     },
     {
       "endTime": "sunset:30",
-      "lowLevel": 32,
+      "lowLevel": 50,
       "highLevel": 64
+    },
+    {
+      "endTime": "23:00",
+      "lowLevel": 10,
+      "highLevel": 24
     },
     {
       "endTime": "23:59",

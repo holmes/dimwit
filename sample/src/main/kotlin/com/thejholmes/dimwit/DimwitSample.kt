@@ -2,49 +2,44 @@ package com.thejholmes.dimwit
 
 import com.google.gson.Gson
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.BehaviorSubject
+import java.io.File
+import java.time.LocalDate
 import java.time.LocalTime
 
 class DimwitSample {
-    val twilight: BehaviorSubject<Twilight> = BehaviorSubject.create<Twilight>()
-    val localTime: BehaviorSubject<LocalTime> = BehaviorSubject.create<LocalTime>()
+    val now: BehaviorSubject<LocalTime>
+    val today: BehaviorSubject<LocalDate>
     val lightZoneParser: LightZoneParser
+    val twilightProvider: TwilightProvider
 
     init {
+        now = BehaviorSubject.create()
+        today = BehaviorSubject.create()
+
         val gson = Gson()
-        lightZoneParser = LightZoneParser(gson, twilight, localTime)
+        twilightProvider = TwilightProvider(gson, File("/work/sunrise-data/data"), today)
+        lightZoneParser = LightZoneParser(gson, twilightProvider.twilight, now)
     }
 
     fun doSomething() {
-        // Initialize w/ some values for twilight
-        twilight.onNext(Twilight.DEFAULT)
-
         val inputString = javaClass.getResource("/zone.json").readText()
         println("Your input:\n $inputString")
 
         val lightZone = lightZoneParser.parse(inputString)
-        lightZone
-                .lightLevels.withLatestFrom(localTime,
-                        BiFunction<LightLevels, LocalTime, Pair<LocalTime, LightLevels>> { levels, now -> Pair(now, levels) })
-                .subscribe { println("${it.first}: ${it.second.lowLevel}/${it.second.highLevel}") }
+        lightZone.lightLevels
+                .subscribe { println("${it.now}: ${it.lowLevel}/${it.highLevel}") }
 
         // Now increment the values and see what happens!
+        today.onNext(LocalDate.now())
         Observable
                 .range(0, LocalTime.MAX.toSecondOfDay() / 60)
                 .map { LocalTime.of(it / 60, it % 60) }
-                .subscribe(localTime)
+                .subscribe(now)
 
-        // Now update Twilight and make sure we see some changes
-        val newTwilight = Twilight.DEFAULT
-                .copy(twilightBegin = LocalTime.of(2, 12))
-                .copy(sunrise = LocalTime.of(4, 52))
-                .copy(solarNoon = LocalTime.of(9, 38))
-                .copy(sunset = LocalTime.of(16, 15))
-                .copy(sunset = LocalTime.of(23, 8))
-
+        // Now update Twilight and make sure we see some changes.
         println("Should see another update:")
-        twilight.onNext(newTwilight)
+        today.onNext(LocalDate.now().plusDays(1))
 
         Thread.sleep(3000)
     }
