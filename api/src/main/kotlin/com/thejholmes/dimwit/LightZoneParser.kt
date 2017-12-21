@@ -39,18 +39,12 @@ data class ParsedLightZone(val deviceId: String, val timeFrames: Array<ParsedTim
             val (base, offset) = endTime.split(":")
             val minuteOffset = offset.toIntOrNull() ?: 0
 
-            try {
-                LocalTime.of(0, minuteOffset.absoluteValue)
-            } catch (e: DateTimeException) {
-                throw IllegalArgumentException("Illegal offset: $offset. ${e.message}", e)
-            }
-
             val legalValues = arrayOf("twilightBegin", "sunrise", "solarNoon", "sunset", "twilightEnd")
             when {
                 endTime.first().isDigit() -> try {
                     // Parse time now.
-                    LocalTime.parse(endTime)
-                } catch (e: DateTimeParseException) {
+                    LocalTime.of(base.toInt(), minuteOffset)
+                } catch (e: DateTimeException) {
                     throw IllegalArgumentException("Unable to convert $endTime to hh:mm. ${e.message}", e)
                 }
                 legalValues.contains(base).not() -> {
@@ -94,6 +88,6 @@ internal fun Twilight.parse(input: String): LocalTime {
         base.equals("solarNoon", true) -> solarNoon(minuteOffset)
         base.equals("sunset", true) -> sunset(minuteOffset)
         base.equals("twilightEnd", true) -> twilightEnd(minuteOffset)
-        else -> { LocalTime.parse(input) }
+        else -> { LocalTime.of(base.toInt(), minuteOffset) }
     }
 }

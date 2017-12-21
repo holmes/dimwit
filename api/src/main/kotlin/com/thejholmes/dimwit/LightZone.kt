@@ -15,7 +15,8 @@ data class LightLevels(val now: LocalDateTime, val lowLevel: Int, val highLevel:
  */
 data class TimeFrame(val endTimeValue: String, val lowLevel: Int, val highLevel: Int) {
     internal fun contains(twilight: Twilight, now: LocalTime): Boolean {
-        return twilight.parse(endTimeValue).isAfter(now)
+        val endTime = twilight.parse(endTimeValue)
+        return endTime == now || endTime.isAfter(now)
     }
 }
 

@@ -58,7 +58,7 @@ class LightZoneUnitTest {
     val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
 
     assertThat(lowLevel).isEqualTo(60)
-    assertThat(highLevel).isEqualTo(60)
+    assertThat(highLevel).isEqualTo(85)
   }
 
   @Test fun justAfterBorder() {

@@ -1,0 +1,35 @@
+{
+  "deviceId": "Nursery",
+  "timeFrames": [
+    {
+      "endTime": "7:00",
+      "lowLevel": 1,
+      "highLevel": 60
+    },
+    {
+      "endTime": "9:00",
+      "lowLevel": 30,
+      "highLevel": 80
+    },
+    {
+      "endTime": "solarNoon:0",
+      "lowLevel": 80,
+      "highLevel": 100
+    },
+    {
+      "endTime": "twilightEnd:0",
+      "lowLevel": 50,
+      "highLevel": 80
+    },
+    {
+      "endTime": "22:00",
+      "lowLevel": 30,
+      "highLevel": 80
+    },
+    {
+      "endTime": "23:59",
+      "lowLevel": 5,
+      "highLevel": 40
+    }
+  ]
+}
