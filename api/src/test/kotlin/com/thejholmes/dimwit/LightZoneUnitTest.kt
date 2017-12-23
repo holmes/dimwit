@@ -20,7 +20,7 @@ class LightZoneUnitTest {
             TimeFrame(MIDNIGHT.plusHours(8).toString(), 30, 60),
             TimeFrame(MIDNIGHT.plusHours(13).toString(), 60, 85),
             TimeFrame(MIDNIGHT.plusHours(20).toString(), 30, 60),
-            TimeFrame(MAX.toString(), 1, 35)
+            TimeFrame("23:59", 1, 35)
     )
 
     twilight = BehaviorSubject.createDefault(Twilight.DEFAULT)
@@ -75,5 +75,13 @@ class LightZoneUnitTest {
 
     assertThat(lowLevel).isEqualTo(58)
     assertThat(highLevel).isEqualTo(60)
+  }
+
+  @Test fun testMidnight() {
+    now.onNext(MAX)
+    val (_, lowLevel, highLevel) = zone.calculateLevels(twilight.value, now.value)
+
+    assertThat(lowLevel).isEqualTo(1)
+    assertThat(highLevel).isEqualTo(35)
   }
 }

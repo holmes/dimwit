@@ -3,7 +3,6 @@ package com.thejholmes.dimwit
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -84,7 +83,8 @@ data class LightZone(
     }
 
     private fun currentFrame(twilight: Twilight, now: LocalTime): ConvertedTimeFrame {
-        return with(timeFrames.first { it.contains(twilight, now) }) {
+        val foundFrame = timeFrames.firstOrNull { it.contains(twilight, now) } ?: timeFrames.last()
+        return with(foundFrame) {
             ConvertedTimeFrame(twilight.parse(endTimeValue), lowLevel, highLevel)
         }
     }
